@@ -7,10 +7,15 @@
     "lib": ["es2018", "DOM"],
     "esModuleInterop": true,
     "module": "commonjs",
-    "strictNullChecks": false,
+    "strictNullChecks": true,  // Enable strict null checks for better type safety
+    "strict": true,            // Enable all strict type-checking options
     "types": ["codeceptjs", "node"],
     "declaration": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "resolveJsonModule": true, // Allow importing .json files
+    "moduleResolution": "node", // Use Node.js module resolution strategy
+    "allowSyntheticDefaultImports": true, // Allow default imports from modules with no default export
+    "forceConsistentCasingInFileNames": true // Ensure file names are case-sensitive
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.spec.ts"]
 }

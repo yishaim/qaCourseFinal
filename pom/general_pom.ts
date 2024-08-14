@@ -2,6 +2,22 @@ import assert from "node:assert";
 
 const { I } = inject();
 
+interface LoginApiResponse {
+    success: boolean;
+    status?: number;
+    error?: string;
+    data?: {
+        user: {
+            _id: string;
+            firstName: string;
+            lastName: string;
+            email: string;
+            __v: number;
+        };
+        token: string;
+    };
+}
+
 export const users = {
     yishaiMarkovitz: {
         email:'yishai.markovitz@similarweb.com',
@@ -42,65 +58,75 @@ const endpoints = {
     deleteUser: 'https://thinking-tester-contact-list.herokuapp.com/users/me',
 }
 
-export const loginApiRequest = async (email: string, password: string) => {
+export const loginApiRequest = async (email: string, password: string): Promise<LoginApiResponse> => {
     try {
         const response = await fetch(endpoints.login, {
             method: "POST",
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({ email, password }),
         });
-        const data = await response.json();
+        let data: any;
         if (!response.ok) {
+            const errorBody = await response.text();
             return {
-                success: response.ok,
+                success: false,
                 status: response.status,
-                error: data || `HTTP error! Status: ${response.status}`,
+                error: errorBody || `HTTP error! Status: ${response.status}`,
+            };
+        }
+        try {
+            data = await response.json();
+        } catch (jsonError) {
+            const jsonErrorMessage = (jsonError as Error).message; // Type assertion
+            return {
+                success: false,
+                error: 'Failed to parse JSON response: ' + jsonErrorMessage,
             };
         }
         return {
             data: data,
-            success: response.ok,
-
+            success: true,
         };
     } catch (error) {
-        return {
-            success: false,
-            error: error.message || 'Unknown error occurred',
-        };
+        if (error instanceof Error) {
+            return {
+                success: false,
+                error: error.message || 'Unknown error occurred',
+            };
+        } else {
+            return {
+                success: false,
+                error: 'Unknown error occurred',
+            };
+        }
     }
 };
 
-export const deleteUserAPI = async (token:string) => {
+export const deleteUserAPI = async (token: string) => {
     try {
         const response = await fetch(endpoints.deleteUser, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
             }
         });
+        const text = await response.text();
+        const data = text ? JSON.parse(text) : null;
         if (!response.ok) {
             throw new Error(`Failed to delete resource. Status: ${response.status}`);
         }
-        const data = await response.json();
         return data;
     } catch (error) {
         console.error('Error during DELETE request:', error);
         throw error;
     }
 };
-
-export const validateUserExistsAPI = async (email: string, password: string, expectedStatus: boolean) => {
+export const validateUserExistsAPI = async (email: string, password: string, expectedStatus:boolean = true) => {
     const userStatus = await loginApiRequest(email, password);
-    if (expectedStatus) {
-        assert.strictEqual(userStatus.success, expectedStatus, "Expected user creation to be successful and saw it was unsuccesful");
-    } else {
-        assert.strictEqual(userStatus.success, false, "Expected user creation to have failed and saw it was successful");
-    }
+    assert.strictEqual(userStatus.success, expectedStatus, `Expected user existance to be ${expectedStatus}\nSaw it was ${userStatus.success}`);
 }
-
 export const validateUrl = async (expectedUrl: EUrls) => {
     const actualUrl = await I.grabCurrentUrl();
     assert.strictEqual(actualUrl, expectedUrl, `Expected URL: ${expectedUrl} - Actual URL: ${actualUrl}`);

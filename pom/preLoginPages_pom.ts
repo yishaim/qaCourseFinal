@@ -11,7 +11,6 @@ export const loginSetUpLocators = {
     lastNameInput: "[id='lastName']",
     submitButton: "[id='submit']",
     cancelButton: "[id='cancel']",
-    input: "input",
     setUpErrorMessage: "[id='error']"
 };
 

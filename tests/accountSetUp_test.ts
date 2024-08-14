@@ -1,7 +1,7 @@
 import {fillSetUpFields, loginSetUpLocators, validateInvalidSetup} from "../pom/preLoginPages_pom";
 import {
     deleteUserAPI,
-    EUrls,
+    EUrls, EWaitTimes,
     loginApiRequest,
     users,
     validateUrl,
@@ -55,8 +55,18 @@ Scenario('Test valid account setup' , async() => {
     fillSetUpFields(testUser);
     await I.click(loginSetUpLocators.submitButton);
     await validateUserExistsAPI(testUser.email, testUser.password, true);
+    await validateUrl(EUrls.contactList);
 });
 Scenario('Test duplicate user creation', async() => {
     I.amOnPage(EUrls.setup);
     await validateInvalidSetup(testUser, "duplicate", true);
+})
+
+Scenario('Test valid login', async() => {
+    I.amOnPage(EUrls.loginPage);
+    I.fillField(loginSetUpLocators.emailInput,testUser.email);
+    I.fillField(loginSetUpLocators.passwordInput,testUser.password);
+    I.click(loginSetUpLocators.loginButton);
+    I.wait(EWaitTimes.SHORT);
+    await validateUrl(EUrls.contactList);
 })

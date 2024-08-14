@@ -40,6 +40,7 @@ export const users = {
 export enum EUrls {
     loginPage = "https://thinking-tester-contact-list.herokuapp.com/login",
     setup = 'https://thinking-tester-contact-list.herokuapp.com/addUser',
+    contactList = 'https://thinking-tester-contact-list.herokuapp.com/contactList',
 }
 
 export const errorMessages = {

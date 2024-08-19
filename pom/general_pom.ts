@@ -20,14 +20,14 @@ interface LoginApiResponse {
 
 export const users = {
     yishaiMarkovitz: {
-        email:'yishai.markovitz@similarweb.com',
+        email:'yishai.markovitz@similarwe.com',
         password: 'qacourse1',
         firstName: "Yishai",
         lastName: "Markovitz"
 
     },
     yishaiMarkovitz2: {
-        email:'yishaimarkovitz@similarweb.com',
+        email:'yishaimarkovitz@similarwe.com',
         password: 'qacourse2',
         firstName: "Yishai2",
         lastName: "Markovitz2"
